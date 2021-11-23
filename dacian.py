@@ -1,5 +1,6 @@
 from datetime import datetime
 from pprint import pprint
+import serial
 
 def decoding_dacian_electrodacus_data(compressed_data):
     payload = {}
@@ -9,7 +10,7 @@ def decoding_dacian_electrodacus_data(compressed_data):
     triple_char_value = uncompressed_list_char[7+22:]
     double_list = [upper_d*91+lower_d for upper_d, lower_d in zip(double_char_value[::2], double_char_value[1::2])]
     triple_list = [upper_t*91**2+mid_t*91+lower_t for upper_t, mid_t, lower_t in zip(triple_char_value[::3], triple_char_value[1::3], triple_char_value[2::3])]
-    payload["sample_time"] = datetime(year=2000+single_char_value[0], month=single_char_value[1], day=single_char_value[2], hour=single_char_value[3], minute=single_char_value[4], second=single_char_value[5]).strftime("%c")
+    payload["Sample Time"] = datetime(year=2000+single_char_value[0], month=single_char_value[1], day=single_char_value[2], hour=single_char_value[3], minute=single_char_value[4], second=single_char_value[5]).strftime("%c")
     payload["SOC"] = double_list[0]
     payload["Cell1"] = double_list[1]/1000
     payload["Cell2"] = double_list[2]/1000
@@ -40,4 +41,9 @@ def decoding_dacian_electrodacus_data(compressed_data):
     payload["Voltage Cell Delta"] = (max(double_list[1:9]) - min(double_list[1:9]))/1000
     return payload
 
-pprint(decoding_dacian_electrodacus_data("8.95L)#<GXG[G[GZGYGXGXGR*I##-#'*#######&v############$DY%N("))
+while True:
+        ser = serial.Serial('/dev/ttyAMA0', 115200)
+        data = ser.readline()
+        compressed_string = data.decode('utf-8').strip()
+        uncompressed_string = decoding_dacian_electrodacus_data(compressed_string)
+        pprint(uncompressed_string)
