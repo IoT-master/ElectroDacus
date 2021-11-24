@@ -33,7 +33,7 @@ def decoding_dacian_electrodacus_data(compressed_data):
     payload["Temperature External F"] = (double_list[10]-450)/10*9/5+32
     payload["Temperature External C"] = (double_list[10]-450)/10
     battery_value = triple_list[0]/1000
-    payload["Current of Battery (- discharging)"] = battery_value if compressed_data[28] !="-" else -battery_value
+    payload["Current of Battery (+ charging)"] = battery_value if compressed_data[28] !="-" else -battery_value
     current_pv1 = triple_list[1]/1000
     payload["Current of PV1"] = current_pv1
     payload["Current of PV2"] = triple_list[2]/1000
