@@ -54,12 +54,14 @@ def decoding_dacian_electrodacus_data(compressed_data):
     payload["Voltage of Min Cell"] = volt_min/1000
     payload["Voltage of Max Cell"] = volt_max/1000
     payload["Power PV1"] = current_pv1 * battery_voltage
+    payload["Power of Battery (+ charging)"] = battery_voltage * payload["Current of Battery (+ charging)"]
+    payload["Pwer of Load"] = battery_voltage * payload["Current of Load"]
     return payload
 
-while True:
-    ser = serial.Serial('/dev/ttyAMA0', 115200)
-    data = ser.readline()
-    compressed_string = data.decode('utf-8').strip()
-    print(compressed_string)
-    uncompressed_string = decoding_dacian_electrodacus_data(compressed_string)
-    pprint(uncompressed_string)
+with serial.Serial('/dev/ttyAMA0', 115200) as ser:
+    while True:
+        data = ser.readline()
+        compressed_string = data.decode('utf-8').strip()
+        print(compressed_string)
+        uncompressed_string = decoding_dacian_electrodacus_data(compressed_string)
+        pprint(uncompressed_string)
